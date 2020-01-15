@@ -604,6 +604,8 @@ private:
   Eigen::Vector2d zmp_r_;
   Eigen::Vector2d zmp_l_;
   Eigen::Vector2d zmp_measured_;
+  Eigen::Vector2d zmp_measured_pre_;
+  Eigen::Vector2d zmp_measured_ppre_;
   Eigen::Vector2d zmp_old_estimation_;
 
   Eigen::Vector6d x_estimation_;

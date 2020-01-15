@@ -5,6 +5,9 @@
     ],
     "files.associations": {
         "thread": "cpp",
-        "texture": "cpp"
+        "texture": "cpp",
+        "matrixd": "cpp",
+        "matrixf": "cpp",
+        "quat": "cpp"
     }
 }
