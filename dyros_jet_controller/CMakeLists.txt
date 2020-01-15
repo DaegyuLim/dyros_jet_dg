@@ -57,6 +57,7 @@ file(GLOB BRIDGE_SRC
 file(GLOB WALKING_SRC
     "src/walking_controller.cpp"
     "src/state_estimator.cpp"
+    "src/com_jacobian.cpp"
     )
 file(GLOB CONTROLLER_SRC
     "src/dyros_jet_model.cpp"
@@ -65,7 +66,6 @@ file(GLOB CONTROLLER_SRC
     "src/haptic_controller.cpp"
     "src/joint_controller.cpp"
     "src/moveit_controller.cpp"
-    "src/quadraticprogram.cpp"
     )
 
 
@@ -86,7 +86,6 @@ target_link_libraries(dyros_jet_controller_lib
     -lrbdl
     -lrbdl_urdfreader
 
-    -lqpOASES
     )
 target_link_libraries(dyros_jet_controller
     dyros_jet_controller_lib

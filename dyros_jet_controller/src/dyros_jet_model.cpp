@@ -7,6 +7,7 @@ namespace dyros_jet_controller
 
 // https://stackoverflow.com/questions/8016780/undefined-reference-to-static-constexpr-char
 constexpr const char* DyrosJetModel::EE_NAME[4];
+constexpr const char* DyrosJetModel::LINK_NAME[29];
 constexpr const size_t DyrosJetModel::HW_TOTAL_DOF;
 constexpr const size_t DyrosJetModel::MODEL_DOF;
 
@@ -77,6 +78,13 @@ DyrosJetModel::DyrosJetModel() :
     std::cout << model_.mBodies[end_effector_id_[i]].mCenterOfMass << std::endl;
   }
 
+  for (size_t i=0; i<29; i++)
+  {
+    link_id_[i] = model_.GetBodyId(LINK_NAME[i]);
+    ROS_INFO("%s: id - %d",LINK_NAME[i], link_id_[i]);
+
+  }
+
   for (size_t i=0; i<HW_TOTAL_DOF; i++)
   {
     joint_name_map_[JOINT_NAME[i]] = i;
@@ -130,6 +138,26 @@ void DyrosJetModel::updateKinematics(const Eigen::VectorXd& q, const Eigen::Vect
     else 
     {
       getJacobianMatrix7DoF((EndEffector)i, &arm_jacobian_[i-2]);
+    }
+  }
+
+  link_mass_[0] = model_.mBodies[link_id_[0]].mMass; //plevis link mass
+  link_inertia_[0] = model_.mBodies[link_id_[0]].mInertia; //plevis link inertia
+
+  for(unsigned int i=1; i<29; i++)
+  {
+    getTransformEachLinks(i, &link_transform_[i-1]);
+    link_local_com_position_[i] =  model_.mBodies[link_id_[i]].mCenterOfMass;
+    link_mass_[i] = model_.mBodies[link_id_[i]].mMass;
+    link_inertia_[i] = model_.mBodies[link_id_[i]].mInertia;
+
+    if(0< i && i<13)
+    {
+      getLegLinksJacobianMatrix(i, &leg_link_jacobian_[i-1]);
+    }
+    else if(14< i && i<29)
+    {
+      getArmLinksJacobianMatrix(i, &arm_link_jacobian_[i-15]);
     }
   }
 }
@@ -233,6 +261,14 @@ void DyrosJetModel::getTransformEndEffector
   // model_.mBodies[0].mCenterOfMass
 }
 
+void DyrosJetModel::getTransformEachLinks // must call updateKinematics before calling this function
+(unsigned int id, Eigen::Isometry3d* transform_matrix)
+{
+  transform_matrix->translation() = RigidBodyDynamics::CalcBodyToBaseCoordinates
+      (model_, q_virtual_, link_id_[id], base_position_, false);
+  transform_matrix->linear() = RigidBodyDynamics::CalcBodyWorldOrientation
+      (model_, q_virtual_, link_id_[id], false).transpose();
+}
 
 void DyrosJetModel::getJacobianMatrix6DoF
 (EndEffector ee, Eigen::Matrix<double, 6, 6> *jacobian)
@@ -317,6 +353,61 @@ void DyrosJetModel::getJacobianMatrix18DoF(EndEffector ee, Eigen::Matrix<double,
     //*jacobian = full_jacobian.block<6, 7>(0, joint_start_index_[ee]);
     ROS_ERROR("Arm is 7 DoF. Please call getJacobianMatrix7DoF");
     break;
+  }
+}
+
+void DyrosJetModel::getLegLinksJacobianMatrix
+(unsigned int id, Eigen::Matrix<double, 6, 6> *jacobian)
+{
+  Eigen::MatrixXd full_jacobian(6,MODEL_WITH_VIRTUAL_DOF);
+  full_jacobian.setZero();
+  RigidBodyDynamics::CalcPointJacobian6D(model_, q_virtual_, link_id_[id],
+                                         Eigen::Vector3d::Zero(), full_jacobian, false);
+  unsigned int ee;
+
+  if( id >0 && id<=6)
+  {
+    ee = 0;
+    jacobian->block<3, 6>(0, 0) = full_jacobian.block<3, 6>(3, joint_start_index_[ee]);
+    jacobian->block<3, 6>(3, 0) = full_jacobian.block<3, 6>(0, joint_start_index_[ee]);
+  }
+  else if( id>=7 && id<13)
+  {
+    ee = 1;
+    jacobian->block<3, 6>(0, 0) = full_jacobian.block<3, 6>(3, joint_start_index_[ee]);
+    jacobian->block<3, 6>(3, 0) = full_jacobian.block<3, 6>(0, joint_start_index_[ee]);
+  }
+  else
+  {
+    ROS_ERROR("Leg link's id is from 1 to 12. Please check the link id number.");
+  }
+}
+
+void DyrosJetModel::getArmLinksJacobianMatrix
+(unsigned int id, Eigen::Matrix<double, 6, 7> *jacobian)
+{
+  Eigen::MatrixXd full_jacobian(6,MODEL_WITH_VIRTUAL_DOF);
+  full_jacobian.setZero();
+  RigidBodyDynamics::CalcPointJacobian6D(model_, q_virtual_, link_id_[id],
+                                         Eigen::Vector3d::Zero(), full_jacobian, false);
+
+  unsigned int ee;
+
+  if( 14<id && id<=21)
+  {
+    ee = 2;
+    jacobian->block<3, 7>(0, 0) = full_jacobian.block<3, 7>(3, joint_start_index_[ee]);
+    jacobian->block<3, 7>(3, 0) = full_jacobian.block<3, 7>(0, joint_start_index_[ee]);
+  }
+  else if(22<=id && id<29)
+  {
+    ee = 3;
+    jacobian->block<3, 7>(0, 0) = full_jacobian.block<3, 7>(3, joint_start_index_[ee]);
+    jacobian->block<3, 7>(3, 0) = full_jacobian.block<3, 7>(0, joint_start_index_[ee]);
+  }
+  else
+  {
+    ROS_ERROR("Arm link's id is from 15 to 28. Please check the link id number.");
   }
 }
 

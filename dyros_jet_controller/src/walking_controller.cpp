@@ -55,18 +55,18 @@ void WalkingController::compute()
         }
         else if (ik_mode_ == 1)
         {
-          computeJacobianControl(lfoot_trajectory_float_, rfoot_trajectory_float_, lfoot_trajectory_euler_float_, rfoot_trajectory_euler_float_, desired_leg_q_dot_);
+          //computeJacobianControl(lfoot_trajectory_float_, rfoot_trajectory_float_, lfoot_trajectory_euler_float_, rfoot_trajectory_euler_float_, desired_leg_q_dot_);
+          getComJacobian();
+          computeComJacobianControl(desired_leg_q_dot_);
+
           for(int i=0; i<12; i++)
           {
-            if(walking_tick_ == 0)
-            {
-              desired_q_(i) = q_init_(i);
-            }
-            desired_q_(i) = desired_leg_q_dot_(i)/hz_ + current_q_(i);
+            //desired_q_(i) = desired_leg_q_dot_(i)/hz_+current_q_(i);
+            desired_q_(i) = desired_leg_q_dot_(i)/hz_+desired_q_not_compensated_(i);
           }
         }
         //////////////////////////////////////////////////////
-
+        
         desired_q_not_compensated_ = desired_q_ ; // IK 풀어서 나온 Desired Joint angle
 
         compensator();
@@ -81,6 +81,8 @@ void WalkingController::compute()
     {
       desired_q_ = current_q_;
     }
+
+    desired_q_pre_ = desired_q_;
   }
 }
 
@@ -192,6 +194,7 @@ void WalkingController::parameterSetting()
   com_control_mode_ = true;
   estimator_flag_ = false; 
 
+  linkMass();
 }
 
 void WalkingController::getRobotState()
@@ -209,6 +212,43 @@ void WalkingController::getRobotState()
   
   model_.updateKinematics(q_temp, qdot_temp);
   
+  /////////////////////////////FTsensor low-pass-filtering////////////////////////////////
+
+  if(walking_tick_ == 0)
+  {
+    r_ft_pre_ = r_ft_;
+    r_ft_ppre_ = r_ft_;
+    r_ft_filtered_pre_ = r_ft_;
+    r_ft_filtered_ppre_ = r_ft_;
+
+    l_ft_pre_ = l_ft_;
+    l_ft_ppre_ = l_ft_;
+    l_ft_filtered_pre_ = l_ft_;
+    l_ft_filtered_ppre_ = l_ft_;
+  }
+
+  for(int i=0; i<6; i++)
+  {
+    //r_ft_filtered_(i) = DyrosMath::secondOrderLowPassFilter(r_ft_(i), r_ft_pre_(i), r_ft_ppre_(i), r_ft_filtered_pre_(i), r_ft_filtered_ppre_(i), 10, 1, hz_);
+    //l_ft_filtered_(i) = DyrosMath::secondOrderLowPassFilter(l_ft_(i), l_ft_pre_(i), l_ft_ppre_(i), l_ft_filtered_pre_(i), l_ft_filtered_ppre_(i), 10, 1, hz_);
+    r_ft_filtered_(i) = 0.8*r_ft_filtered_pre_(i) + 0.2*r_ft_(i);
+    l_ft_filtered_(i) = 0.8*l_ft_filtered_pre_(i) + 0.2*l_ft_(i);
+    //r_ft_filtered_(i) = r_ft_(i);
+    //l_ft_filtered_(i) = l_ft_(i);
+  }
+
+  r_ft_ppre_ = r_ft_pre_;
+  r_ft_pre_ = r_ft_;
+  r_ft_filtered_ppre_ = r_ft_filtered_pre_;
+  r_ft_filtered_pre_ = r_ft_filtered_;
+
+  l_ft_ppre_ = l_ft_pre_;
+  l_ft_pre_ = l_ft_;
+  l_ft_filtered_ppre_ = l_ft_filtered_pre_;
+  l_ft_filtered_pre_ = l_ft_filtered_;
+  ////////////////////////////////////////////////////////
+
+
   com_float_current_ = model_.getCurrentCom(); 
   com_float_current_dot_= model_.getCurrentComDot();
   
@@ -250,6 +290,32 @@ void WalkingController::getRobotState()
   {
     com_float_prev_ = com_float_current_;
   }  
+
+  linkInertia();
+  computeZmp();
+
+  double switch_l_ft;
+  double switch_r_ft;
+
+  if(l_ft_(2) > 10)
+  {
+    switch_l_ft = 1;
+  }
+  else
+  {
+    switch_l_ft = 0;
+  }
+
+  if(r_ft_(2) > 10)
+  {
+    switch_r_ft = 1;
+  }
+  else
+  {
+    switch_r_ft = 0;
+  }
+
+  ////////////////////THREAD CALC///////////////////////////
   slowcalc_mutex_.lock();
   thread_q_ = current_q_;
   current_motor_q_leg_ = current_q_.segment<12>(0); // 시뮬레이션에서 모터 각도와 링크 각도에 같은 값이 들어가고 있음.

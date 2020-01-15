@@ -114,6 +114,12 @@ public:
   void updateNextStepTime();
   void updateInitialState();
 
+  void linkMass();
+  void linkInertia();
+  Eigen::Matrix3d inertiaTensorTransform(Eigen::Matrix3d local_inertia, double mass, Eigen::Isometry3d transformation);
+  void getComJacobian();
+  void computeComJacobianControl(Eigen::Vector12d &desired_leg_q_dot);
+
   //functions for getFootStep()
   void floatToSupportFootstep();
   void addZmpOffset();
@@ -124,6 +130,7 @@ public:
   void calculateFootStepSeparate();
   void calculateFootStepTotal();
   void usingFootStepPlanner();
+  void computeZmp();
 
   //functions in compensator()
   void hipCompensator(); //reference Paper: http://dyros.snu.ac.kr/wp-content/uploads/2017/01/ICHR_2016_JS.pdf
@@ -227,11 +234,28 @@ private:
   double walking_time_ = 0;
 
   //sensorData
+  //sensorData
   Eigen::Vector6d r_ft_;
   Eigen::Vector6d l_ft_;
+  Eigen::Vector6d r_ft_pre_;
+  Eigen::Vector6d l_ft_pre_;
+  Eigen::Vector6d r_ft_ppre_;
+  Eigen::Vector6d l_ft_ppre_;
+
+  Eigen::Vector6d r_ft_filtered_;
+  Eigen::Vector6d l_ft_filtered_;
+  Eigen::Vector6d r_ft_filtered_pre_;
+  Eigen::Vector6d l_ft_filtered_pre_;
+  Eigen::Vector6d r_ft_filtered_ppre_;
+  Eigen::Vector6d l_ft_filtered_ppre_;
+
   Eigen::Vector3d imu_acc_;
   Eigen::Vector3d imu_ang_;
+  Eigen::Vector3d imu_ang_old_;
+  Eigen::Vector3d imu_ang_dot_;
   Eigen::Vector3d imu_grav_rpy_;
+
+  Eigen::Vector3d f_ft_support_;
 
   //parameterSetting()
   double t_last_;
@@ -291,6 +315,8 @@ private:
 
   VectorQd start_q_;
   VectorQd desired_q_;
+  VectorQd desired_q_pre_;
+
   VectorQd target_q_;
   const VectorQd& current_q_;
   const VectorQd& current_qdot_;
@@ -376,9 +402,17 @@ private:
   Eigen::Vector12d q_des;
   Eigen::Vector12d desired_leg_q_;
   Eigen::Vector12d desired_leg_q_dot_;
+  Eigen::Vector12d desired_leg_q_pre_;
   Eigen::Vector3d com_desired_;
   Eigen::Vector3d com_dot_desired_;
+
   Eigen::Vector2d zmp_desired_;
+  Eigen::Vector2d zmp_desired_pre_;
+  Eigen::Vector2d zmp_desired_ppre_;
+
+  Eigen::Vector2d zmp_desired_filtered_;
+  Eigen::Vector2d zmp_desired_filtered_pre_;
+  Eigen::Vector2d zmp_desired_filtered_ppre_;
 
   Eigen::Isometry3d rfoot_trajectory_support_;  //local frame
   Eigen::Isometry3d lfoot_trajectory_support_;
@@ -396,6 +430,50 @@ private:
   Eigen::Vector3d lfoot_trajectory_euler_float_;
   Eigen::Vector3d rfoot_trajectory_dot_float_;
   Eigen::Vector3d lfoot_trajectory_dot_float_;
+
+  //comJacobian variables
+  Eigen::Matrix<double, 6, 1> mass_l_leg_;
+  Eigen::Matrix<double, 6, 1> mass_r_leg_;
+  Eigen::Matrix<double, 7, 1> mass_l_arm_;
+  Eigen::Matrix<double, 7, 1> mass_r_arm_;
+  Eigen::Matrix<double, 3, 1> mass_body_;
+  double mass_total_;
+
+  Eigen::Matrix3d inertia_link_float_[29];
+  Eigen::Matrix3d inertia_total_;
+
+  Eigen::Vector3d c_l_leg_[6];
+  Eigen::Vector3d c_r_leg_[6];
+  Eigen::Vector3d c_l_arm_[7];
+  Eigen::Vector3d c_r_arm_[7];
+  Eigen::Vector3d c_waist_[3];
+
+  Eigen::Matrix6d adjoint_support_;
+  Eigen::Matrix6d adjoint_21_;
+  Eigen::Vector3d disturbance_accel_;
+  Eigen::Vector3d disturbance_accel_old_;
+  Eigen::Vector3d desired_w_;
+  Eigen::Vector3d desired_u_;
+  Eigen::Vector3d desired_u_old_;
+  Eigen::Vector3d desired_u_dot_;
+  Eigen::Vector6d x2_d_dot_;
+
+  Eigen::Matrix<double, 3, 6> j_rleg_com_total_support;
+  Eigen::Matrix<double, 3, 6> j_lleg_com_total_support;
+
+  Eigen::Matrix<double, 3, 7> j_rarm_com_total_support;
+  Eigen::Matrix<double, 3, 7> j_larm_com_total_support;
+
+  Eigen::Matrix6d j1_;
+  Eigen::Matrix6d j2_;
+  Eigen::Matrix<double, 3, 6> j_v1_;
+  Eigen::Matrix<double, 3, 6> j_w1_;
+
+  Eigen::Matrix<double, 3, 6> j_com_psem_;
+  Eigen::Vector3d desired_c_dot_psem_;
+
+  Eigen::Matrix6d j_total_;
+  Eigen::Vector6d c_total_;
 
   //getComTrajectory() variables
   double xi_;

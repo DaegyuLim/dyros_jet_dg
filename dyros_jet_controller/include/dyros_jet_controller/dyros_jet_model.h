@@ -35,7 +35,19 @@ public:
       {"L_AnkleRoll_Link", "R_AnkleRoll_Link",
        "L_HandYaw_Link", "R_HandYaw_Link" };
 
+  static constexpr const char* LINK_NAME[29] =
+      {"base_link",
+       "L_HipYaw_Link", "L_HipRoll_Link", "L_HipPitch_Link", "L_KneePitch_Link", "L_AnklePitch_Link", "L_AnkleRoll_Link",
+       "R_HipYaw_Link", "R_HipRoll_Link", "R_HipPitch_Link", "R_KneePitch_Link", "R_AnklePitch_Link", "R_AnkleRoll_Link",
+       "WaistPitch_Link", "WaistYaw_Link",
+       "L_ShoulderPitch_Link", "L_ShoulderRoll_Link", "L_ShoulderYaw_Link",
+       "L_ElbowRoll_Link", "L_WristYaw_Link", "L_WristRoll_Link", "L_HandYaw_Link",
+       "R_ShoulderPitch_Link", "R_ShoulderRoll_Link", "R_ShoulderYaw_Link",
+       "R_ElbowRoll_Link", "R_WristYaw_Link", "R_WristRoll_Link", "R_HandYaw_Link"
+      };
+
   unsigned int end_effector_id_[4];
+  unsigned int link_id_[29];
   const unsigned int joint_start_index_[4];
 
   void test();
@@ -72,10 +84,14 @@ public:
   void getTransformEndEffector(EndEffector ee, const Eigen::VectorXd& q, bool update_kinematics,
                                   Eigen::Vector3d* position, Eigen::Matrix3d* rotation);
 
+  void getTransformEachLinks(unsigned int id, Eigen::Isometry3d* transform_matrix);
 
   void getJacobianMatrix6DoF(EndEffector ee, Eigen::Matrix<double, 6, 6> *jacobian);
   void getJacobianMatrix7DoF(EndEffector ee, Eigen::Matrix<double, 6, 7> *jacobian);
   void getJacobianMatrix18DoF(EndEffector ee, Eigen::Matrix<double, 6, 18> *jacobian);
+
+  void getLegLinksJacobianMatrix(unsigned int id, Eigen::Matrix<double, 6, 6> *jacobian);
+  void getArmLinksJacobianMatrix(unsigned int id, Eigen::Matrix<double, 6, 7> *jacobian);
 
   void getCenterOfMassPosition(Eigen::Vector3d* position);
   void getCenterOfMassPositionDot(Eigen::Vector3d* position);
@@ -92,10 +108,16 @@ public:
   const Eigen::Vector3d& getCurrentCom(){ return com_;}
   const Eigen::Vector3d& getCurrentComDot(){return comDot_;}
 
+  const Eigen::Isometry3d& getCurrentLinkTransform(unsigned int i) { return link_transform_[i]; }
+  const Eigen::Matrix<double, 6, 6>& getLegLinkJacobian(unsigned int i) { return leg_link_jacobian_[i]; }
+  const Eigen::Matrix<double, 6, 7>& getArmLinkJacobian(unsigned int i) { return arm_link_jacobian_[i]; }
+  const Eigen::Vector3d & getLinkComPosition(unsigned int id) { return link_local_com_position_[id];}
+  const double & getLinkMass(unsigned int id) { return link_mass_[id]; }
+  const Eigen::Matrix3d & getLinkInertia(unsigned int id) { return link_inertia_[id]; }
+
   const Eigen::Vector3d& getSimulationCom(){return com_simulation_;}
   const Eigen::Vector3d& getSimulationGyro(){return gyro_simulation_;}
   const Eigen::Vector3d& getSimulationAccel(){return accel_simulation_;}
-
 
   const Eigen::Vector6d& getMujocoCom(){return q_virtual_1;}
   const Eigen::Vector6d& getMujocoComDot(){return q_dot_virtual_1;}
@@ -128,14 +150,20 @@ private:
   Eigen::Vector3d base_position_;
 
   Eigen::Isometry3d currnet_transform_[4];
+  Eigen::Isometry3d link_transform_[28];    //all of links
+  double link_mass_[29];
+  Eigen::Vector3d link_local_com_position_[29];
+  Eigen::Matrix3d link_inertia_[29];
 
   Eigen::Matrix<double, 6, 6> leg_jacobian_[2];
   Eigen::Matrix<double, 6, 7> arm_jacobian_[2];
   Eigen::Matrix<double, 6, 18> leg_with_vlink_jacobian_[2];
 
+  Eigen::Matrix<double, 6, 6> leg_link_jacobian_[12];  //from pelvis to each leg's links
+  Eigen::Matrix<double, 6, 7> arm_link_jacobian_[14];  //from pelvis to each arm's links including two waist joints
+
   Eigen::Matrix<double, 34, 34> full_inertia_mat_;
   Eigen::Matrix<double, 18, 18> leg_inertia_mat_;
-
 
   Eigen::Vector3d com_;
   Eigen::Vector3d comDot_;

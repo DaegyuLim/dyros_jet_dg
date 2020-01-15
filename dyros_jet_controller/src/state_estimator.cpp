@@ -6,6 +6,52 @@
 namespace dyros_jet_controller
 {
 
+void WalkingController::computeZmp()
+{
+  if(foot_step_(current_step_num_,6)==1 && walking_tick_ >= t_start_real_+t_double1_ && walking_tick_ < t_start_+t_total_-t_double2_-t_rest_last_) // left support and right swing phase
+  {
+    zmp_r_.setZero();
+
+  }
+  else
+  {
+    //zmp_r_(0) = (-r_ft_(4) - r_ft_(0)*0.0062) / r_ft_(2);
+    //zmp_r_(1) = (r_ft_(3) - r_ft_(1)*0.0062) / r_ft_(2);
+    zmp_r_(0) = (-r_ft_filtered_(4)) / r_ft_filtered_(2);
+    zmp_r_(1) = (r_ft_filtered_(3)) / r_ft_filtered_(2);
+  }
+
+  if(foot_step_(current_step_num_,6)==0 && walking_tick_ >= t_start_real_+t_double1_ && walking_tick_ < t_start_+t_total_-t_double2_-t_rest_last_) // right support and left swing phase
+  {
+    zmp_l_.setZero();
+
+  }
+  else
+  {
+    //zmp_l_(0) = (-l_ft_(4) - l_ft_(0)*0.0062) / l_ft_(2);
+    //zmp_l_(1) = (l_ft_(3) - l_ft_(1)*0.0062) / l_ft_(2);
+    zmp_l_(0) = (-l_ft_filtered_(4)) / l_ft_filtered_(2);
+    zmp_l_(1) = (l_ft_filtered_(3)) / l_ft_filtered_(2);
+
+  }
+
+  zmp_measured_ppre_ = zmp_measured_pre_;
+  zmp_measured_pre_ = zmp_measured_;
+
+  if (foot_step_(current_step_num_,6)==1) //left foot support
+  {
+    zmp_measured_(0) = ((((rfoot_support_current_.linear()).topLeftCorner<2, 2>()*zmp_r_)(0) + (rfoot_support_current_.translation())(0))*r_ft_(2) + zmp_l_(0)*l_ft_(2)) / (r_ft_(2) + l_ft_(2));
+    zmp_measured_(1) = ((((rfoot_support_current_.linear()).topLeftCorner<2, 2>()*zmp_r_)(1) + (rfoot_support_current_.translation())(1))*r_ft_(2) + zmp_l_(1)*l_ft_(2)) / (r_ft_(2) + l_ft_(2));
+    f_ft_support_ = l_ft_.segment<3>(0) + rfoot_support_current_.linear()*r_ft_.segment<3>(0);
+  }
+  else
+  {
+    zmp_measured_(0) = ((((lfoot_support_current_.linear()).topLeftCorner<2, 2>()*zmp_l_)(0) + (lfoot_support_current_.translation())(0))*l_ft_(2) + zmp_r_(0)*r_ft_(2)) / (r_ft_(2) + l_ft_(2));
+    zmp_measured_(1) = ((((lfoot_support_current_.linear()).topLeftCorner<2, 2>()*zmp_l_)(1) + (lfoot_support_current_.translation())(1))*l_ft_(2) + zmp_r_(1)*r_ft_(2)) / (r_ft_(2) + l_ft_(2));
+    f_ft_support_ = r_ft_.segment<3>(0) + lfoot_support_current_.linear()*l_ft_.segment<3>(0);
+  }
+}
+
 void WalkingController::getQpEstimationInputMatrix()
 {
   double mass_total = 51.315;

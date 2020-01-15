@@ -14,7 +14,8 @@
                 "/home/myeongju/catkin_ws/src/dyros_jet/dyros_jet_gui/include",
                 "/home/myeongju/catkin_ws/src/dyros_jet/dyros_jet_haptic/include",
                 "/home/myeongju/catkin_ws/src/mujoco_ros_sim/mujoco_ros/include",
-                "/usr/include"
+                "/usr/include",
+                "${workspaceFolder}/dyros_jet_controller/include"
             ],
             "name": "Linux",
             "intelliSenseMode": "gcc-x64",
