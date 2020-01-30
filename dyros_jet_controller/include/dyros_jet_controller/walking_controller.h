@@ -20,21 +20,21 @@ const std::string FILE_NAMES[FILE_CNT] =
 {
   ///change this directory when you use this code on the other computer///
 
-  "/home/myeongju/data/walking/0_desired_zmp_.txt",
-  "/home/myeongju/data/walking/1_desired_com_.txt",
-  "/home/myeongju/data/walking/2_desired_q_.txt",
-  "/home/myeongju/data/walking/3_real_q_.txt",
-  "/home/myeongju/data/walking/4_desired_swingfoot_.txt",
-  "/home/myeongju/data/walking/5_desired_pelvis_trajectory_.txt",
-  "/home/myeongju/data/walking/6_current_com_pelvis_trajectory_.txt",
-  "/home/myeongju/data/walking/7_current_foot_trajectory_.txt",
-  "/home/myeongju/data/walking/8_QPestimation_variables_.txt",
-  "/home/myeongju/data/walking/9_ft_sensor_.txt",
-  "/home/myeongju/data/walking/10_ext_encoder_.txt",
-  "/home/myeongju/data/walking/11_kalman_estimator2_.txt",
-  "/home/myeongju/data/walking/12_kalman_estimator1_.txt",
-  "/home/myeongju/data/walking/13_kalman_estimator3_.txt",
-  "/home/myeongju/data/walking/14_grav_torque_.txt"
+  "/home/dg/data/walking/0_desired_zmp_.txt",
+  "/home/dg/data/walking/1_desired_com_.txt",
+  "/home/dg/data/walking/2_desired_q_.txt",
+  "/home/dg/data/walking/3_real_q_.txt",
+  "/home/dg/data/walking/4_desired_swingfoot_.txt",
+  "/home/dg/data/walking/5_desired_pelvis_trajectory_.txt",
+  "/home/dg/data/walking/6_current_com_pelvis_trajectory_.txt",
+  "/home/dg/data/walking/7_current_foot_trajectory_.txt",
+  "/home/dg/data/walking/8_QPestimation_variables_.txt",
+  "/home/dg/data/walking/9_ft_sensor_.txt",
+  "/home/dg/data/walking/10_ext_encoder_.txt",
+  "/home/dg/data/walking/11_kalman_estimator2_.txt",
+  "/home/dg/data/walking/12_kalman_estimator1_.txt",
+  "/home/dg/data/walking/13_kalman_estimator3_.txt",
+  "/home/dg/data/walking/14_grav_torque_.txt"
 
 };
 
@@ -72,13 +72,13 @@ public:
     file[7]<<"walking_tick_"<<"\t"<<"current_step_num_"<<"\t"<<"rfoot_support_current_.translation()(0)"<<"\t"<<"rfoot_support_current_.translation()(1)"<<"\t"<<"rfoot_support_current_.translation()(2)"
           <<"\t"<<"lfoot_support_current_.translation()(0)"<<"\t"<<"lfoot_support_current_.translation()(1)"<<"\t"<<"lfoot_support_current_.translation()(2)"<<endl;
     file[8]<<"walking_tick_"<<"\t"<<"current_step_num_"<<"\t"<<"vars.x[0]"<<"\t"<<"vars.x[1]"<<"\t"<<"vars.x[2]"<<"\t"<<"vars.x[3]"<<"\t"<<"vars.x[4]"<<"\t"<<"vars.x[5]"<<"\t"<<"zmp_measured_(0)"<<"\t"<<"zmp_measured_(1)"<<"\t"<<"zmp_r_(0)"<<"\t"<<"zmp_r_(1)"<<"\t"<<"zmp_l_(0)"<<"\t"<<"zmp_l_(1)"<<endl;
-    file[9]<<"walking_tick_"<<"\t"<<"current_step_num_"<<"\t"<<"r_ft_(0)"<<"\t"<<"r_ft_(1)"<<"\t"<<"r_ft_(2)"<<"\t"<<"r_ft_(3)"<<"\t"<<"r_ft_(4)"<<"\t"<<"r_ft_(5)"<<"\t"<<"l_ft_(0)"<<"\t"<<"l_ft_(1)"<<"\t"<<"l_ft_(2)"<<"\t"<<"l_ft_(3)"<<"\t"<<"l_ft_(4)"<<"\t"<<"l_ft_(5)"<<endl;
+    file[9]<<"walking_tick_"<<"\t"<<"current_step_num_"<<"\t"<<"r_ft_(0)"<<"\t"<<"r_ft_(1)"<<"\t"<<"r_ft_(2)"<<"\t"<<"r_ft_(3)"<<"\t"<<"r_ft_(4)"<<"\t"<<"r_ft_(5)"<<"\t"<<"l_ft_(0)"<<"\t"<<"l_ft_(1)"<<"\t"<<"l_ft_(2)"<<"\t"<<"l_ft_(3)"<<"\t"<<"l_ft_(4)"<<"\t"<<"l_ft_(5)"<<"\t"<<"imu_grav_rpy_(0)"<<"\t"<<"imu_grav_rpy_(2)"<<"\t"<<"imu_grav_rpy_(3)"<<endl;
     file[10]<<"walking_tick_"<<"\t"<<"current_step_num_"<<"\t"<<"current_link_q_leg_(0)"<<"\t"<<"current_link_q_leg_(1)"<<"\t"<<"current_link_q_leg_(2)"<<"\t"<<"current_link_q_leg_(3)"<<"\t"<<"current_link_q_leg_(4)"<<"\t"<<"current_link_q_leg_(5)"<<"\t"<<
               "current_link_q_leg_(6)"<<"\t"<<"current_link_q_leg_(7)"<<"\t"<<"current_link_q_leg_(8)"<<"\t"<<"current_link_q_leg_(9)"<<"\t"<<"current_link_q_leg_(10)"<<"\t"<<"current_link_q_leg_(11)"<<endl;
     file[11]<<"walking_tick_"<<"\t"<<"X_hat_post_2_(0)"<<"\t"<<"X_hat_post_2_(1)"<<"\t"<<"X_hat_post_2_(2)"<<"\t"<<"X_hat_post_2_(3)"<<"\t"<<"X_hat_post_2_(4)"<<"\t"<<"X_hat_post_2_(5)"<<"\t"<<"X_hat_post_2_(6)"<<"\t"<<"X_hat_post_2_(7)"<<endl;
     file[12]<<"walking_tick_"<<"\t"<<"X_hat_post_1_(0)"<<"\t"<<"X_hat_post_1_(1)"<<"\t"<<"X_hat_post_1_(2)"<<"\t"<<"X_hat_post_1_(3)"<<"\t"<<"X_hat_post_1_(4)"<<"\t"<<"X_hat_post_1_(5)"<<endl;
     file[13]<<"walking_tick_"<<"\t"<<"X_hat_post_3_(0)"<<"\t"<<"X_hat_post_3_(1)"<<"\t"<<"X_hat_post_3_(2)"<<"\t"<<"X_hat_post_3_(3)"<<"\t"<<"X_hat_post_3_(4)"<<"\t"<<"X_hat_post_3_(5)"<<endl;
-    file[14]<<"walking_tick_"<<"\t"<<"grav_ground_torque_(0)"<<"\t"<<"grav_ground_torque_(1)"<<"\t"<<"grav_ground_torque_(2)"<<"\t"<<"grav_ground_torque_(3)"<<"\t"<<"grav_ground_torque_(4)"<<"\t"<<"grav_ground_torque_(5)"<<endl;
+    file[14]<<"walking_tick_"<<"\t"<<"grav_ground_torque_(0)"<<"\t"<<"grav_ground_torque_(1)"<<"\t"<<"grav_ground_torque_(2)"<<"\t"<<"grav_ground_torque_(3)"<<"\t"<<"grav_ground_torque_(4)"<<"\t"<<"grav_ground_torque_(5)"<<"\t"<<"grav_ground_torque_(6)"<<"\t"<<"grav_ground_torque_(7)"<<"\t"<<"grav_ground_torque_(8)"<<"\t"<<"grav_ground_torque_(9)"<<"\t"<<"grav_ground_torque_(10)"<<"\t"<<"grav_ground_torque_(11)"<<endl;
 
   }
   //WalkingController::~WalkingController()
@@ -233,6 +233,7 @@ private:
   unsigned int com_tick_ = 0;
   double walking_time_ = 0;
 
+  double support_flag_ = 2; // left support: 0, right support: 1, double support: 2
   //sensorData
   //sensorData
   Eigen::Vector6d r_ft_;
@@ -523,6 +524,8 @@ private:
   //Gravitycompensate
   Eigen::Vector12d joint_offset_angle_;
   Eigen::Vector12d grav_ground_torque_;
+  Eigen::Vector12d grav_ground_torque_pre_;
+  Eigen::Vector12d grav_ground_torque_filtered_;
 
   //vibrationCotrol
   std::mutex slowcalc_mutex_;

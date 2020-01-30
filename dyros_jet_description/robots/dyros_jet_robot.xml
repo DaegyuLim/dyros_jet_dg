@@ -2,7 +2,7 @@
     <compiler angle="radian" meshdir="../meshes/"/>
     <size njmax="500" nconmax="100" />
 	
-    <?option gravity= "0 0 0"/?>
+    <!-- <option gravity= "0 0 0"/> -->
 	<default>
 
 	<geom rgba = ".7 .7 .7 1"/>
@@ -65,8 +65,7 @@
     <worldbody>
 	<geom name='floor' pos='0 0 0' size='5 5 .125' type='plane' material="MatPlane" condim = "3" contype = "0"/>	
 	<light directional="true" cutoff="60" exponent="1" diffuse="1 1 1" specular=".1 .1 .1" pos="1 1 1.5" dir="-1 -1 -1.3"/>
-	
-	
+        
         <body name="base_link" pos="0 0 0.08027">
 			<joint type="free" limited='false' damping="0" stiffness="0" armature="0"/>
             <inertial pos="0 0 0.08027" quat="0.707107 0.707107 0 0" mass="3.90994" diaginertia="0.027242 0.0239919 0.00634116" />
@@ -241,19 +240,19 @@
         </body>
     </worldbody>
 	<actuator>		
-		<position class="position" ctrllimited="true" ctrlrange="-5 5"  name="L_HipYaw" joint="L_HipYaw" kp = "7000"/> ?15000 DOB:7000(Offline) 
-                <position class="position" ctrllimited="false"  name="L_HipRoll" joint="L_HipRoll" kp = "7000"/> ?15000 DOB:7000(Offline) 
-		<position class="position" ctrllimited="true" ctrlrange="-5 5"  name="L_HipPitch" joint="L_HipPitch" kp = "7000"/> ?15000 DOB:7000(Offline) 
-	        <position class="position" ctrllimited="false"   name="L_KneePitch" joint="L_KneePitch" kp = "7000"/> ?15000 DOB:7000(Offline) 
-		<position class="position" ctrllimited="true" ctrlrange="-5 5"  name="L_AnklePitch" joint="L_AnklePitch" kp = "7000"/> ?15000 DOB:7000(Offline) 
-                <position class="position" ctrllimited="true" ctrlrange="-5 5"  name="L_AnkleRoll" joint="L_AnkleRoll" kp = "7000"/> ?15000 DOB:7000(Offline)
+		<position class="position" ctrllimited="true" ctrlrange="-5 5"  name="L_HipYaw" joint="L_HipYaw" kp = "2000"/> ?15000 DOB:7000(Offline) 
+        <position class="position" ctrllimited="false"  name="L_HipRoll" joint="L_HipRoll" kp = "2000"/> ?15000 DOB:7000(Offline) 
+		<position class="position" ctrllimited="true" ctrlrange="-5 5"  name="L_HipPitch" joint="L_HipPitch" kp = "2000"/> ?15000 DOB:7000(Offline) 
+	    <position class="position" ctrllimited="false"   name="L_KneePitch" joint="L_KneePitch" kp = "2000"/> ?15000 DOB:7000(Offline) 
+		<position class="position" ctrllimited="true" ctrlrange="-5 5"  name="L_AnklePitch" joint="L_AnklePitch" kp = "2000"/> ?15000 DOB:7000(Offline) 
+        <position class="position" ctrllimited="true" ctrlrange="-5 5"  name="L_AnkleRoll" joint="L_AnkleRoll" kp = "2000"/> ?15000 DOB:7000(Offline)
 					
-		<position class="position" ctrllimited="true" ctrlrange="-5 5"  name="R_HipYaw" joint="R_HipYaw" kp = "7000"/> ?15000 DOB:7000(Offline) 
-                <position class="position" ctrllimited="false"   name="R_HipRoll" joint="R_HipRoll" kp = "7000"/> ?15000 DOB:7000(Offline)
-		<position class="position" ctrllimited="true" ctrlrange="-5 5"  name="R_HipPitch" joint="R_HipPitch" kp = "7000"/> ?15000 DOB:7000(Offline) 
-		<position class="position" ctrllimited="false"  name="R_KneePitch" joint="R_KneePitch" kp = "7000"/> ?15000 DOB:7000(Offline)
-		<position class="position" ctrllimited="true" ctrlrange="-5 5"  name="R_AnklePitch" joint="R_AnklePitch" kp = "7000"/> ?15000 DOB:7000(Offline) 
-                <position class="position" ctrllimited="true" ctrlrange="-5 5"  name="R_AnkleRoll" joint="R_AnkleRoll" kp = "7000"/> ?15000 DOB:7000(Offline)
+		<position class="position" ctrllimited="true" ctrlrange="-5 5"  name="R_HipYaw" joint="R_HipYaw" kp = "2000"/> ?15000 DOB:7000(Offline) 
+        <position class="position" ctrllimited="false"   name="R_HipRoll" joint="R_HipRoll" kp = "2000"/> ?15000 DOB:7000(Offline)
+		<position class="position" ctrllimited="true" ctrlrange="-5 5"  name="R_HipPitch" joint="R_HipPitch" kp = "2000"/> ?15000 DOB:7000(Offline) 
+		<position class="position" ctrllimited="false"  name="R_KneePitch" joint="R_KneePitch" kp = "2000"/> ?15000 DOB:7000(Offline)
+		<position class="position" ctrllimited="true" ctrlrange="-5 5"  name="R_AnklePitch" joint="R_AnklePitch" kp = "2000"/> ?15000 DOB:7000(Offline) 
+        <position class="position" ctrllimited="true" ctrlrange="-5 5"  name="R_AnkleRoll" joint="R_AnkleRoll" kp = "2000"/> ?15000 DOB:7000(Offline)
 
                 <position class="position" ctrllimited="true" ctrlrange="-3 3"  name="WaistPitch" joint="WaistPitch" kp = "35000"/>
                 <position class="position" ctrllimited="true" ctrlrange="-3 3"  name="WaistYaw" joint="WaistYaw" kp = "35000"/>
@@ -294,7 +293,7 @@
 	</sensor>
 
 	<keyframe>
-		<key time="0" qpos ="0 0 0.90 1 0 0 0  
+		<key time="0" qpos ="0 0 1.00 1 0 0 0  
 				 
 				     0 0.034906585  -0.034906585 0.733038285 -0.6981317 -0.034906585
 		   		     0 -0.034906585 0.034906585 -0.733038285 0.6981317 0.034906585 

@@ -557,6 +557,60 @@ static void toEulerAngle(double qx, double qy, double qz, double qw, double& rol
 
 }
 
+static Eigen::Vector4d rot2Axis(Eigen::Matrix3d Rot)
+{
+  double theta;
+  double tmp;
+  Eigen::Vector4d result;
+  Eigen::Vector3d omega;
+
+  tmp = (Rot.trace()-1)/2;
+
+  if(tmp > 1)
+  {
+    tmp = 1.0;
+  }
+  else if(tmp < -1)
+  {
+    tmp = -1.0;
+  }
+
+  theta=acos(tmp);
+
+  if(theta == 0)
+  {
+    omega.setZero();
+  }
+  else
+  {
+    omega(0) = (Rot(2,1)-Rot(1,2));
+    omega(1) = (Rot(0,2)-Rot(2,0));
+    omega(2) = (Rot(1,0)-Rot(0,1));
+    omega.normalize();
+  }
+  result.segment<3>(0) = omega;
+  result(3) = theta;
+
+  return result;
+}
+
+static Eigen::Matrix3d axis2Rot(Eigen::Vector4d W)
+{
+  Eigen::Matrix3d Rot;
+  Eigen::Matrix3d I;
+  double theta;
+  Eigen::Vector3d omega;
+  Eigen::Matrix3d skew_w;
+  skew_w = DyrosMath::skew(omega);
+  I.setIdentity();
+
+  theta = W(4);
+  omega = W.segment<3>(0);
+  Rot = I + sin(theta)*(skew_w) + (1-cos(theta))*(skew_w)*(skew_w);
+
+  return Rot;
+}
+
 static Eigen::Vector3d QuinticSpline(
                    double time,       ///< Current time
                    double time_0,     ///< Start time
@@ -620,14 +674,17 @@ static Eigen::Vector3d QuinticSpline(
   return result;
 }
 
-static inline double lowPassFilter(double input, double prev, double ts, double tau)
+static inline double lowPassFilter(double input, double prev, double ts, double fc)
 {
-    return (tau*prev + ts*input)/(tau+ts);
+  double tau = 1/(2*M_PI*fc);
+  return (tau*prev + ts*input)/(tau+ts);
 }
+
 template <int N>
-static Eigen::Matrix<double, N, 1> lowPassFilter(Eigen::Matrix<double, N, 1> input, Eigen::Matrix<double, N, 1> prev, double ts, double tau)
+static Eigen::Matrix<double, N, 1> lowPassFilter(Eigen::Matrix<double, N, 1> input, Eigen::Matrix<double, N, 1> prev, double ts, double fc)
 {
   Eigen::Matrix<double, N, 1> res;
+  double tau = 1/(2*M_PI*fc);
   for(int i=0; i<N; i++)
   {
     res(i) = lowPassFilter(input(i), prev(i), ts, tau);

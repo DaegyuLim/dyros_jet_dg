@@ -8,6 +8,13 @@
         "texture": "cpp",
         "matrixd": "cpp",
         "matrixf": "cpp",
-        "quat": "cpp"
+        "quat": "cpp",
+        "iostream": "cpp",
+        "random": "cpp",
+        "functional": "cpp",
+        "cmath": "cpp",
+        "complex": "cpp",
+        "core": "cpp",
+        "block": "cpp"
     }
 }

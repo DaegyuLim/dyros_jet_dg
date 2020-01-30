@@ -11,7 +11,6 @@ void WalkingController::computeZmp()
   if(foot_step_(current_step_num_,6)==1 && walking_tick_ >= t_start_real_+t_double1_ && walking_tick_ < t_start_+t_total_-t_double2_-t_rest_last_) // left support and right swing phase
   {
     zmp_r_.setZero();
-
   }
   else
   {
@@ -24,7 +23,6 @@ void WalkingController::computeZmp()
   if(foot_step_(current_step_num_,6)==0 && walking_tick_ >= t_start_real_+t_double1_ && walking_tick_ < t_start_+t_total_-t_double2_-t_rest_last_) // right support and left swing phase
   {
     zmp_l_.setZero();
-
   }
   else
   {
@@ -1393,7 +1391,5 @@ void WalkingController::kalmanFilter3()
 
   //cout << "K_" << K_ << endl;
 }
-
-
 
 }

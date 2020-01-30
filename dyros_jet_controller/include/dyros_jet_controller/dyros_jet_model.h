@@ -99,6 +99,9 @@ public:
   void getInertiaMatrix34DoF(Eigen::Matrix<double, 34, 34> *inertia);
   void getInertiaMatrix18DoF(Eigen::Matrix<double, 18, 18> *leg_inertia);
 
+  void getGravityTorque6DoF(EndEffector ee, Eigen::Matrix<double, 6, 1> *grav_torque);
+  void getGravityTorque7DoF(EndEffector ee, Eigen::Matrix<double, 7, 1> *grav_torque);
+
 
   const Eigen::Vector12d& getCurrentExtencoder(){ return q_ext_; }
   const Eigen::Isometry3d& getCurrentTrasmfrom(EndEffector ee) { return currnet_transform_[ee]; }
@@ -135,7 +138,9 @@ public:
 
   const Eigen::Matrix<double, 18, 18>& getLegInertia() { return leg_inertia_mat_; }
   const Eigen::Matrix<double, 34, 34>& getFullInertia() { return full_inertia_mat_; }
-
+  
+  const Eigen::Vector6d& getLegGravTorque(unsigned int i) { return leg_grav_torque_[i]; }
+  const Eigen::Matrix<double, 7, 1>& getArmGravTorque(unsigned int i) { return arm_grav_torque_[i]; }
 
 private:
   RigidBodyDynamics::Model model_;
@@ -164,6 +169,8 @@ private:
 
   Eigen::Matrix<double, 34, 34> full_inertia_mat_;
   Eigen::Matrix<double, 18, 18> leg_inertia_mat_;
+  Eigen::Vector6d leg_grav_torque_[2];
+  Eigen::Matrix<double, 7, 1> arm_grav_torque_[2];
 
   Eigen::Vector3d com_;
   Eigen::Vector3d comDot_;

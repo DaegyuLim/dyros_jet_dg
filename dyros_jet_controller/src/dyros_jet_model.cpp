@@ -124,6 +124,7 @@ void DyrosJetModel::updateKinematics(const Eigen::VectorXd& q, const Eigen::Vect
 
   getInertiaMatrix34DoF(&full_inertia_mat_);
   getInertiaMatrix18DoF(&leg_inertia_mat_);
+
   getCenterOfMassPosition(&com_);
   getCenterOfMassPositionDot(&comDot_);
   for(unsigned int i=0; i<4; i++)
@@ -133,11 +134,12 @@ void DyrosJetModel::updateKinematics(const Eigen::VectorXd& q, const Eigen::Vect
     {
       getJacobianMatrix6DoF((EndEffector)i, &leg_jacobian_[i]);
       getJacobianMatrix18DoF((EndEffector)i, &leg_with_vlink_jacobian_[i]);
-
+      getGravityTorque6DoF((EndEffector)i, &leg_grav_torque_[i]);
     }
     else 
     {
       getJacobianMatrix7DoF((EndEffector)i, &arm_jacobian_[i-2]);
+      getGravityTorque7DoF((EndEffector)i, &arm_grav_torque_[i-2]);
     }
   }
 
@@ -216,6 +218,7 @@ void DyrosJetModel::updateMujComDot(const Eigen::Vector6d &sim_base)
 void DyrosJetModel::getTransformEndEffector // must call updateKinematics before calling this function
 (EndEffector ee, Eigen::Isometry3d* transform_matrix)
 {
+  RigidBodyDynamics:
   //Eigen::Vector3d gghg = RigidBodyDynamics::CalcBodyToBaseCoordinates(model_, q_virtual_, end_effector_id_[ee], base_position_, false);
   transform_matrix->translation() = RigidBodyDynamics::CalcBodyToBaseCoordinates
       (model_, q_virtual_, end_effector_id_[ee], base_position_, false);
@@ -368,14 +371,14 @@ void DyrosJetModel::getLegLinksJacobianMatrix
   if( id >0 && id<=6)
   {
     ee = 0;
-    jacobian->block<3, 6>(0, 0) = full_jacobian.block<3, 6>(3, joint_start_index_[ee]);
-    jacobian->block<3, 6>(3, 0) = full_jacobian.block<3, 6>(0, joint_start_index_[ee]);
+    jacobian->block<3, 6>(0, 0) = full_jacobian.block<3, 6>(3, joint_start_index_[ee]+6);
+    jacobian->block<3, 6>(3, 0) = full_jacobian.block<3, 6>(0, joint_start_index_[ee]+6);
   }
   else if( id>=7 && id<13)
   {
     ee = 1;
-    jacobian->block<3, 6>(0, 0) = full_jacobian.block<3, 6>(3, joint_start_index_[ee]);
-    jacobian->block<3, 6>(3, 0) = full_jacobian.block<3, 6>(0, joint_start_index_[ee]);
+    jacobian->block<3, 6>(0, 0) = full_jacobian.block<3, 6>(3, joint_start_index_[ee]+6);
+    jacobian->block<3, 6>(3, 0) = full_jacobian.block<3, 6>(0, joint_start_index_[ee]+6);
   }
   else
   {
@@ -396,14 +399,14 @@ void DyrosJetModel::getArmLinksJacobianMatrix
   if( 14<id && id<=21)
   {
     ee = 2;
-    jacobian->block<3, 7>(0, 0) = full_jacobian.block<3, 7>(3, joint_start_index_[ee]);
-    jacobian->block<3, 7>(3, 0) = full_jacobian.block<3, 7>(0, joint_start_index_[ee]);
+    jacobian->block<3, 7>(0, 0) = full_jacobian.block<3, 7>(3, joint_start_index_[ee]+6);
+    jacobian->block<3, 7>(3, 0) = full_jacobian.block<3, 7>(0, joint_start_index_[ee]+6);
   }
   else if(22<=id && id<29)
   {
     ee = 3;
-    jacobian->block<3, 7>(0, 0) = full_jacobian.block<3, 7>(3, joint_start_index_[ee]);
-    jacobian->block<3, 7>(3, 0) = full_jacobian.block<3, 7>(0, joint_start_index_[ee]);
+    jacobian->block<3, 7>(0, 0) = full_jacobian.block<3, 7>(3, joint_start_index_[ee]+6);
+    jacobian->block<3, 7>(3, 0) = full_jacobian.block<3, 7>(0, joint_start_index_[ee]+6);
   }
   else
   {
@@ -466,5 +469,51 @@ void DyrosJetModel::getInertiaMatrix18DoF(Eigen::Matrix<double, 18, 18> *leg_ine
   leg_inertia->block<18, 18>(0, 0) = full_inertia.block<18, 18>(0, 0);
 }
 
+void DyrosJetModel::getGravityTorque6DoF(EndEffector ee, Eigen::Matrix<double, 6, 1> *grav_torque)
+{
+  // Non-realtime
+  Eigen::VectorXd nonlinear_torque(MODEL_WITH_VIRTUAL_DOF);
+  nonlinear_torque.setZero();
+  Eigen::Matrix<double, 34, 1> qdot;
+  qdot.setZero();
+  RigidBodyDynamics::NonlinearEffects(model_, q_virtual_, qdot, nonlinear_torque);
 
+  switch (ee)
+  {
+  case EE_LEFT_FOOT:
+    grav_torque->block<6, 1>(0, 0)= nonlinear_torque.block<6, 1>(6, 0);
+    break;
+  case EE_RIGHT_FOOT:
+    grav_torque->block<6, 1>(0, 0) = nonlinear_torque.block<6, 1 >(12, 0);
+    break;
+  case EE_LEFT_HAND:
+  case EE_RIGHT_HAND:
+    ROS_ERROR("Arm is 7 DoF. Please call getGravityTorque7DoF");
+    break;
+  }
+}
+
+void DyrosJetModel::getGravityTorque7DoF(EndEffector ee, Eigen::Matrix<double, 7, 1> *grav_torque)
+{
+  // Non-realtime
+  Eigen::VectorXd nonlinear_torque(MODEL_WITH_VIRTUAL_DOF);
+  nonlinear_torque.setZero();
+  Eigen::Matrix<double, 34, 1> qdot;
+  qdot.setZero();
+  RigidBodyDynamics::NonlinearEffects(model_, q_virtual_, qdot, nonlinear_torque);
+
+  switch (ee)
+  {
+  case EE_LEFT_FOOT:
+  case EE_RIGHT_FOOT:
+    ROS_ERROR("Arm is 7 DoF. Please call getGravityTorque7DoF");
+    break;
+  case EE_LEFT_HAND:
+    grav_torque->block<7, 1>(0, 0) = nonlinear_torque.block<7, 1>(20, 0);
+    break;
+  case EE_RIGHT_HAND:
+    grav_torque->block<7, 1>(0, 0) = nonlinear_torque.block<7, 1>(27, 0);
+    break;
+  }
+}
 }
