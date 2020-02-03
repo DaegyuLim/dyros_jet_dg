@@ -278,6 +278,7 @@ private:
   bool ready_for_thread_flag_;
   bool ready_for_compute_flag_;
   bool estimator_flag_;
+  bool update_with_motor_encoder_; // choose between update kinematic and dynamic variables with 'currnet_q_' and 'desird_q_'
 
   int ik_mode_;
   int walk_mode_;

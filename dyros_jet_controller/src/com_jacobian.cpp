@@ -220,11 +220,11 @@ void WalkingController::getComJacobian()
 
   double switch_l_ft;
   double switch_r_ft;
-  kc = 150;    //com error gain
-  kp = 30;     //zmp error gain
-  kd = 0.000;   //dob gain
-  kf = 150;    //foot position error gain 
-  kw = 150;   //orientation error gain
+  kc = 180;     //sim desired: 150 sim real: 180 //com error gain
+  kp = 30;      //sim desired: 30 sim real: 30  //zmp error gain
+  kd = 0.000;     //dob gain
+  kf = 180;    //sim desired: 150  sin real: 180  //foot position error gain 
+  kw = 150;   //sim desired: 150, sim real: 150     //orientation error gain
 
   //kc = 300.0; kp = 45.0; kd = 0.005;  //gains for real robot
   //kf = 300.0; kw = 200.0;

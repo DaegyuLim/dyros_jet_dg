@@ -60,7 +60,15 @@ void WalkingController::compute()
 
           for(int i=0; i<12; i++)
           {
-            desired_q_(i) = desired_leg_q_dot_(i)/hz_+desired_leg_q_pre_(i);
+            if(update_with_motor_encoder_ == true)
+            {
+              desired_q_(i) = desired_leg_q_dot_(i)/hz_+current_q_(i);  // feedback control
+            }
+            else
+            {
+              desired_q_(i) = desired_leg_q_dot_(i)/hz_+desired_leg_q_pre_(i); // feedforward control
+            }
+            // desired_q_(i) = desired_leg_q_dot_(i)/hz_+desired_leg_q_pre_(i); // feedforward control
             //desired_q_(i) = desired_leg_q_dot_(i)/hz_+desired_q_not_compensated_(i);
           }
           desired_leg_q_pre_ = desired_q_.segment<12>(0);
@@ -212,6 +220,7 @@ void WalkingController::parameterSetting()
   gyro_frame_flag_ = false;
   com_control_mode_ = true;
   estimator_flag_ = false; 
+  update_with_motor_encoder_ = true;
 
   linkMass();
 }
@@ -223,7 +232,7 @@ void WalkingController::getRobotState()
   q_temp.segment<28>(6) = current_q_.segment<28>(0); //segment<포함갯수>(시작점) 
   qdot_temp.segment<28>(6)= current_qdot_.segment<28>(0);
   
-  if(walking_tick_ > 0) // Using desired joint angle for kinematics update
+  if(walking_tick_ > 0 && update_with_motor_encoder_ == false) // Using desired joint angle for kinematics update
   {
     q_temp.segment<12>(6) = desired_q_not_compensated_.segment<12>(0); //segment<포함갯수>(시작점), desired_q_not_compensated_ 는 IK에서 구해지는 Desired Joint angle.     
   }
@@ -878,9 +887,12 @@ void WalkingController::updateInitialState()
     q_temp.segment<28>(6) = current_q_.segment<28>(0);
     qdot_temp.segment<28>(6)= current_qdot_.segment<28>(0);  
     
-    q_temp.segment<12>(6) = desired_q_not_compensated_.segment<12>(0);
-     
-    model_.updateKinematics(q_temp, qdot_temp);
+    if(update_with_motor_encoder_ == false)
+    {
+      q_temp.segment<12>(6) = desired_q_not_compensated_.segment<12>(0);
+      model_.updateKinematics(q_temp, qdot_temp);
+    }
+    
      
     lfoot_float_init_ = model_.getCurrentTrasmfrom((DyrosJetModel::EndEffector)(0));
     rfoot_float_init_ = model_.getCurrentTrasmfrom((DyrosJetModel::EndEffector)(1));
@@ -1719,6 +1731,7 @@ void WalkingController::getFootTrajectory_MJ()
   "," << lfoot_trajectory_euler_support_(0) << "," << lfoot_trajectory_euler_support_(1) << "," << lfoot_trajectory_euler_support_(2) << "," << rfoot_trajectory_euler_support_(0) << "," << rfoot_trajectory_euler_support_(1) << "," << rfoot_trajectory_euler_support_(2) 
   << std::endl;  
 }
+
 
 void WalkingController::supportToFloatPattern()
 {
