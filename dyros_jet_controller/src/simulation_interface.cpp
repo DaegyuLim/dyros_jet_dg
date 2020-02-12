@@ -35,7 +35,7 @@ SimulationInterface::SimulationInterface(ros::NodeHandle &nh, double Hz):
 
   joint_set_msg_.name.resize(total_dof_);
   joint_set_msg_.position.resize(total_dof_);
-  for(int i=0; i<total_dof_; i++)
+  for(int i=0; i<total_dof_; i++)   
   {
     joint_set_msg_.name[i] = DyrosJetModel::JOINT_NAME[i];
   }

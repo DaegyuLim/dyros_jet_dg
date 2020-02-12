@@ -220,11 +220,11 @@ void WalkingController::getComJacobian()
 
   double switch_l_ft;
   double switch_r_ft;
-  kc = 180;     //sim desired: 150 sim real: 180 //com error gain
-  kp = 30;      //sim desired: 30 sim real: 30  //zmp error gain
+  kc = 150;     //sim desired: 150 sim real: 180 //com error gain
+  kp = 25;      //sim desired: 30 sim real: 30  //zmp error gain
   kd = 0.000;     //dob gain
-  kf = 180;    //sim desired: 150  sin real: 180  //foot position error gain 
-  kw = 150;   //sim desired: 150, sim real: 150     //orientation error gain
+  kf = 150;    //sim desired: 150  sin real: 180  //foot position error gain 
+  kw = 100;   //sim desired: 150, sim real: 150     //orientation error gain
 
   //kc = 300.0; kp = 45.0; kd = 0.005;  //gains for real robot
   //kf = 300.0; kw = 200.0;
@@ -337,8 +337,8 @@ void WalkingController::getComJacobian()
     swing_foot_w.setZero();
     swing_foot_w(2) = rfoot_trajectory_dot_support_(5);
 
-    // x2_d_dot_.segment<3>(0) = rfoot_trajectory_dot_support_.segment<3>(0) + kf*(error_foot);
-    x2_d_dot_.segment<3>(0) = kf*(error_foot);
+    x2_d_dot_.segment<3>(0) = rfoot_trajectory_dot_support_.segment<3>(0) + kf*(error_foot);
+    // x2_d_dot_.segment<3>(0) = kf*(error_foot);
     x2_d_dot_.segment<3>(3) = swing_foot_w + kw*(error_foot_w.segment<3>(0)*error_foot_w(3));
 
 
@@ -372,8 +372,8 @@ void WalkingController::getComJacobian()
     swing_foot_w.setZero();
     swing_foot_w(2) = lfoot_trajectory_dot_support_(5);
 
-    // x2_d_dot_.segment<3>(0) = lfoot_trajectory_dot_support_.segment<3>(0) + kf*(error_foot);
-    x2_d_dot_.segment<3>(0) = kf*(error_foot);
+    x2_d_dot_.segment<3>(0) = lfoot_trajectory_dot_support_.segment<3>(0) + kf*(error_foot);
+    // x2_d_dot_.segment<3>(0) = kf*(error_foot);
     x2_d_dot_.segment<3>(3) = swing_foot_w + kw*(error_foot_w.segment<3>(0)*error_foot_w(3));
 
 

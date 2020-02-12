@@ -151,7 +151,6 @@ void ControlBase::compute()
 
   tick_ ++;
   control_time_ = tick_ / Hz_;
-
   //cout << "current_q_ext" << q_ext_ <<endl;
   /*
   if ((tick_ % 200) == 0 )
@@ -206,10 +205,10 @@ void ControlBase::reflect()
     }
   }
   if (walking_controller_.walking_state_send == true)
-    {
-      walkingState_msg.data = walking_controller_.walking_end_;
-      walkingstate_command_pub_.publish(walkingState_msg);
-    }
+  {
+    walkingState_msg.data = walking_controller_.walking_end_;
+    walkingstate_command_pub_.publish(walkingState_msg);
+  }
 }
 
 void ControlBase::parameterInitialize()
@@ -322,6 +321,7 @@ void ControlBase::walkingCommandCallback(const dyros_jet_msgs::WalkingCommandCon
     walking_controller_.setEnable(true);
     walking_controller_.setTarget(msg->walk_mode, msg->compensator_mode[0], msg->compensator_mode[1], msg->ik_mode, msg->heel_toe, msg->first_foot_step,
         msg->x, msg->y, msg->z, msg->height, msg->theta, msg-> step_length_x, msg-> step_length_y, msg->walking_pattern);
+        
   }
   else
   {

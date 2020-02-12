@@ -103,9 +103,11 @@ public:
   //functions in compute
   void getRobotState();
   void getComTrajectory_MJ();
+  void getComTrajectory_DG();
   void getZmpTrajectory();
   void getPelvTrajectory();
   void getFootTrajectory_MJ();
+  void getFootTrajectory_DG();
   void computeIkControl_MJ(Eigen::Isometry3d float_trunk_transform, Eigen::Isometry3d float_lleg_transform, Eigen::Isometry3d float_rleg_transform, Eigen::Vector12d& desired_leg_q);
   void computeJacobianControl(Eigen::Isometry3d float_lleg_transform, Eigen::Isometry3d float_rleg_transform, Eigen::Vector3d float_lleg_transform_euler, Eigen::Vector3d float_rleg_transform_euler, Eigen::Vector12d& desired_leg_q_dot);
   void compensator();
@@ -350,11 +352,11 @@ private:
   Eigen::Vector6d swingfoot_support_init_;
   Eigen::Vector6d swingfoot_support_init_offset_;
 
-  Eigen::Isometry3d pelv_suppprt_start_;
+  Eigen::Isometry3d pelv_support_start_;
 
   Eigen::Vector3d com_float_init_;
   Eigen::Vector3d com_support_init_;
-
+  
   double lfoot_zmp_offset_;   //have to be initialized
   double rfoot_zmp_offset_;
   Eigen::Vector3d com_offset_;
@@ -386,6 +388,12 @@ private:
   Eigen::Isometry3d pelv_support_current_;
   Eigen::Isometry3d lfoot_support_current_;
   Eigen::Isometry3d rfoot_support_current_;
+  Eigen::Isometry3d swingfoot_support_current_;
+  Eigen::Isometry3d swingfoot_landing_point_support_;
+  
+
+  Eigen::Vector3d lfoot_support_euler_current_;
+  Eigen::Vector3d rfoot_support_euler_current_;
 
   Eigen::Vector3d com_float_current_;
   Eigen::Vector3d com_float_current_dot_;
@@ -406,7 +414,11 @@ private:
   Eigen::Vector12d desired_leg_q_dot_;
   Eigen::Vector12d desired_leg_q_pre_;
   Eigen::Vector3d com_desired_;
+  Eigen::Vector3d com_desired_init_;
   Eigen::Vector3d com_dot_desired_;
+  Eigen::Vector3d com_dot_desired_init_;
+  Eigen::Vector3d com_ddot_desired_;
+  Eigen::Vector3d com_ddot_desired_init_;
 
   Eigen::Vector2d zmp_desired_;
   Eigen::Vector2d zmp_desired_pre_;

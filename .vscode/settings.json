@@ -15,6 +15,13 @@
         "cmath": "cpp",
         "complex": "cpp",
         "core": "cpp",
-        "block": "cpp"
+        "block": "cpp",
+        "future": "cpp",
+        "*.tcc": "cpp",
+        "vector": "cpp",
+        "system_error": "cpp",
+        "type_traits": "cpp",
+        "memory": "cpp",
+        "mutex": "cpp"
     }
 }

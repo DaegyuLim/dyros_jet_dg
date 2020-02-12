@@ -185,13 +185,14 @@ void mujoco_interface::writeDevice()
   {
     for(int i=0;i<total_dof_;i++)
     {
-     mujoco_joint_set_msg_.position[i] = desired_q_(i);
+      mujoco_joint_set_msg_.position[i] = desired_q_(i);
     }
-     mujoco_joint_set_msg_.header.stamp = ros::Time::now();
-     mujoco_joint_set_msg_.time = mujoco_sim_time;
-     // mujoco_joint_set_msg_.time = ControlBase::currentTime();
-     mujoco_joint_set_pub_.publish(mujoco_joint_set_msg_);
-     mujoco_sim_last_time = mujoco_sim_time;
+    
+    mujoco_joint_set_msg_.header.stamp = ros::Time::now();
+    mujoco_joint_set_msg_.time = mujoco_sim_time;
+    // mujoco_joint_set_msg_.time = ControlBase::currentTime();
+    mujoco_joint_set_pub_.publish(mujoco_joint_set_msg_);
+    mujoco_sim_last_time = mujoco_sim_time;
   }
 }
 
